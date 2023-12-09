@@ -1,6 +1,7 @@
 import random
+import csv
 networksize = 20
-trials = 10000 
+trials = 10000
 infection_probability = .1
 it_removal_num = 5
 total_days = 0
@@ -12,10 +13,14 @@ def print_2d_array(arr):
         for element in row:
             print(element, end='\t') 
         print()
-        
+#possibly make method that saves all the data in a csv file
 def numInfected(arr):
     second_row = arr[1]
     infected_count = sum(1 for element in second_row if element != 0)
+    return infected_count
+def dayInfectedCount(arr):
+    first_row = arr[0]
+    infected_count = sum(1 for element in first_row if element != 0)
     return infected_count
 def check_all_infected(arr):
     second_row = arr[1]
@@ -27,9 +32,10 @@ def check_clean(network):
         return 1
     else:
         return 0
-def infection_rate(probability):
+def infection_rate(probability,virusCount):
+    adjustedInfectionRate = round(1 - ((1-probability)**virusCount), virusCount+1)
     random_value = random.random()
-    if random_value <= probability:
+    if random_value <= adjustedInfectionRate:
         return 1
     else:
         return 0
@@ -51,15 +57,16 @@ def simulation_start(NUMOFCOMPUTERS,infectionprob,removal_num):
 
 
 def simulation(network, infection, removal):
-    day = -1
+    day = 0
     while check_clean(network) == 0:
+        dayVirusCount = dayInfectedCount(network)
         day += 1
         print("Day: ", day)
         print("Infection Spreading")
         #Infection spread simulation
         for x in range(len(network[0])):
             if network[0][x] != 1:
-                network[0][x] = infection_rate(infection)
+                network[0][x] = infection_rate(infection,dayVirusCount)
                 if network[0][x] == 1:
                     network[1][x] += 1
         print_2d_array(network)
